@@ -1,3 +1,5 @@
+//package ldraw;
+
 
 public class gtMatrix {
 	
@@ -9,8 +11,45 @@ public class gtMatrix {
 		return I;
 	}
 	
+	public static gtMatrix Scale(float x, float y, float z) {
+		gtMatrix S = Identity();
+		S.data[0][0] *= x;
+		S.data[1][1] *= y;
+		S.data[2][2] *= z;
+		return S;
+	}
+	
+	public static gtMatrix Ortho(float l, float r, float b, float t, float n, float f) {
+		gtMatrix O = Identity();
+		O.data[0][0] = 2/(r - l);
+		O.data[1][1] = 2/(t - b);
+		O.data[2][2] = -2/(f - n);
+		O.data[0][3] = (r + l)/(r - l);
+		O.data[1][3] = (t + b)/(t - b);
+		O.data[2][3] = (f + n)/(f - n);
+		return O;
+	}
+	
+	public static gtMatrix Frustum(float l, float r, float b, float t, float n, float f) {
+		gtMatrix F = Identity();
+		F.data[0][0] = 2*n/(r - l);
+		F.data[1][1] = 2*n/(t - b);
+		F.data[2][2] = -(f + n)/(f - n);
+		F.data[3][3] = 0;
+		F.data[0][2] = (r + l)/(r - l);
+		F.data[1][2] = (t + b)/(t - b);
+		F.data[3][2] = -1;
+		F.data[2][3] = -2*f*n/(f - n);
+		return F;
+	}
+	
+	public static gtMatrix Frustum(float fov, float n, float f) {
+		float h = (float) (n/Math.cos(fov/2));
+		return Frustum(-h, h, -h, h, n, f);
+	}
+	
 	public gtMatrix() {
-		data = new double[4][4];
+		data = new float[4][4];
 		data[3][3] = 1;
 	}
 	
@@ -70,15 +109,15 @@ public class gtMatrix {
 		return A;
 	}
 	
-	public void translate(double x, double y, double z) {
+	public void translate(float x, float y, float z) {
 		translate(new gtVector(x,y,z,1));
 	}
 	
-	public gtMatrix translated(double x, double y, double z) {
+	public gtMatrix translated(float x, float y, float z) {
 		return translated(new gtVector(x,y,z,1));
 	}
 	
-	public void rotate(double angle, gtVector axis) {
+	public void rotate(float angle, gtVector axis) {
 		gtMatrix R = Identity();
 		for(int i=0; i < cols()-1; i++) {
 			R.col(i, R.col(i).rotated(angle, axis));
@@ -86,18 +125,24 @@ public class gtMatrix {
 		this.copyOver(this.mult(R));
 	}
 	
-	public gtMatrix rotated(double angle, gtVector axis) {
+	public gtMatrix rotated(float angle, gtVector axis) {
 		gtMatrix A = new gtMatrix(this);
 		A.rotate(angle, axis);
 		return A;
 	}
 	
-	public void rotate(double angle, double x, double y, double z) {
+	public void rotate(float angle, float x, float y, float z) {
 		rotate(angle, new gtVector(x,y,z,1));
 	}
 	
-	public gtMatrix rotated(double angle, double x, double y, double z) {
+	public gtMatrix rotated(float angle, float x, float y, float z) {
 		return rotated(angle, new gtVector(x,y,z,1));
+	}
+	
+	public void scale(float sx, float sy, float sz) {
+		gtMatrix S = Scale(sx, sy, sz);
+		gtMatrix mS = this.mult(S);
+		this.copyOver(mS);
 	}
 	
 	public gtMatrix mult(gtMatrix B) {
@@ -128,5 +173,5 @@ public class gtMatrix {
 		return out;
 	}
 	
-	double data[][];
+	float data[][];
 }

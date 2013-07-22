@@ -1,3 +1,5 @@
+//package ldraw;
+
 
 public class gtVector {
 	
@@ -25,31 +27,31 @@ public class gtVector {
 		this(other.x(), other.y(), other.z(), other.w());
 	}
 	
-	public gtVector(double x, double y, double z) {
+	public gtVector(float x, float y, float z) {
 		this(x,y,z,1);
 	}
 	
-	public gtVector(double x, double y, double z, double w) {
-		data = new double[4];
+	public gtVector(float x, float y, float z, float w) {
+		data = new float[4];
 		data[0] = x;
 		data[1] = y;
 		data[2] = z;
 		data[3] = w;
 	}
 	
-	public void x(double _x) {
+	public void x(float _x) {
 		data[0] = _x;
 	}
 	
-	public void y(double _y) {
+	public void y(float _y) {
 		data[1] = _y;
 	}
 	
-	public void z(double _z) {
+	public void z(float _z) {
 		data[2] = _z;
 	}
 	
-	public void w(double _w) {
+	public void w(float _w) {
 		data[3] = _w;
 	}
 	
@@ -64,24 +66,30 @@ public class gtVector {
 			this.data[i] = a.data[i];
 		}
 	}
+
+	public void hom_scale(float w) {
+		for(int i=0; i < hom_size(); i++) {
+			this.data[i] /= w;
+		}
+	}
 	
-	public double x() {
+	public float x() {
 		return data[0];
 	}
 	
-	public double y() {
+	public float y() {
 		return data[1];
 	}
 	
-	public double z() {
+	public float z() {
 		return data[2];
 	}
 	
-	public double w() {
+	public float w() {
 		return data[3];
 	}
 	
-	public double[] data() {
+	public float[] data() {
 		return data;
 	}
 	
@@ -101,7 +109,7 @@ public class gtVector {
 		return true;
 	}
 	
-	public boolean near(gtVector other, double tol) {
+	public boolean near(gtVector other, float tol) {
 		for(int i=0; i < size(); i++) {
 			if(Math.abs(data[i]-other.data[i]) > tol)
 				return false;
@@ -109,13 +117,13 @@ public class gtVector {
 		return true;
 	}
 	
-	public void scale(double a) {
+	public void scale(float a) {
 		for(int i=0; i < hom_size(); i++) {
 			data[i] *= a;
 		}
 	}
 	
-	public gtVector scaled(double a) {
+	public gtVector scaled(float a) {
 		gtVector b = new gtVector(this);
 		b.scale(a);
 		return b;
@@ -133,8 +141,8 @@ public class gtVector {
 		return add(b.scaled(-1));
 	}
 	
-	public double dot(gtVector b) {
-		double dot_prod = 0;
+	public float dot(gtVector b) {
+		float dot_prod = 0;
 		for(int i=0; i < data.length; i++) {
 			dot_prod += data[i]*b.data[i];
 		}
@@ -149,16 +157,16 @@ public class gtVector {
 		return c;
 	}
 	
-	public double norm() {
-		double sqr_sum = 0;
+	public float norm() {
+		float sqr_sum = 0;
 		for(int i=0; i < hom_size(); i++) {
 			sqr_sum += data[i]*data[i];
 		}
-		return Math.sqrt(sqr_sum);
+		return (float) Math.sqrt(sqr_sum);
 	}
 	
 	public void normalize() {
-		double norm = norm();
+		float norm = norm();
 		if(norm == 0)
 			return;
 		for(int i=0; i < hom_size(); i++) {
@@ -172,34 +180,30 @@ public class gtVector {
 		return unit;
 	}
 	
-	public void rotate(double angle, gtVector axis) {
+	public void rotate(float angle, gtVector axis) {
 		axis.normalize();
 		gtVector a = axis.scaled(axis.dot(this));
 		gtVector b = this.sub(a);
-		double p = b.norm();
+		float p = b.norm();
 		b.normalize();
 		gtVector c = axis.cross(b);
-		double x = Math.cos(angle);
-		double y = Math.sin(angle);
+		float x = (float) Math.cos(angle);
+		float y = (float) Math.sin(angle);
 		gtVector d = b.scaled(x).add(c.scaled(y)).scaled(p);
 		gtVector e = d.add(a);
 		this.xyz(e);
 	}
 	
-	public gtVector rotated(double angle, gtVector axis) {
+	public gtVector rotated(float angle, gtVector axis) {
 		gtVector r = new gtVector(this);
 		r.rotate(angle, axis);
 		return r;
 	}
 	
 	public String toString() {
-		String out = "";
-		out += "[" + x() + ", " + y() + ", " + z() + ", " + w() + "]";
-		
 		String s = String.format("[% .5f, % .5f, % .5f, % .5f]", x(), y(), z(), w());
-		
 		return s;
 	}
 	
-	double data[];
+	float data[];
 }

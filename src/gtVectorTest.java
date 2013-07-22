@@ -1,4 +1,5 @@
 import static org.junit.Assert.*;
+import ldraw.gtVector;
 
 import org.junit.Test;
 
